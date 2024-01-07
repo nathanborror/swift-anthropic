@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "AnthropicKit",
+    name: "swift-anthropic",
     platforms: [
         .iOS(.v16),
         .macOS(.v13),
@@ -12,18 +12,18 @@ let package = Package(
         .tvOS(.v16),
     ],
     products: [
-        .library(name: "AnthropicKit", targets: ["AnthropicKit"]),
+        .library(name: "Anthropic", targets: ["Anthropic"]),
         .executable(name: "AnthropicCmd", targets: ["AnthropicCmd"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", branch: "main"),
     ],
     targets: [
-        .target(name: "AnthropicKit"),
+        .target(name: "Anthropic"),
         .executableTarget(name: "AnthropicCmd", dependencies: [
-            "AnthropicKit",
+            "Anthropic",
             .product(name: "ArgumentParser", package: "swift-argument-parser"),
         ]),
-        .testTarget(name: "AnthropicKitTests", dependencies: ["AnthropicKit"]),
+        .testTarget(name: "AnthropicTests", dependencies: ["Anthropic"]),
     ]
 )

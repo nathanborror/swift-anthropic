@@ -1,7 +1,7 @@
 import XCTest
-@testable import AnthropicKit
+@testable import Anthropic
 
-final class AnthropicKitTests: XCTestCase {
+final class AnthropicTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest
