@@ -1,5 +1,5 @@
 import ArgumentParser
-import AnthropicKit
+import Anthropic
 
 @main
 struct Cmd: AsyncParsableCommand {
