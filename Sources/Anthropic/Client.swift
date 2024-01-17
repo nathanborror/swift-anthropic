@@ -2,12 +2,24 @@ import Foundation
 
 public final class AnthropicClient {
     
-    let host: URL
-    let token: String
+    public struct Configuration {
+        public let host: URL
+        public let token: String
+        
+        init(host: URL = URL(string: "https://api.anthropic.com/v1")!, token: String) {
+            self.host = host
+            self.token = token
+        }
+    }
     
-    public init(token: String) {
-        self.host = URL(string: "https://api.anthropic.com/v1")!
-        self.token = token
+    public let configuration: Configuration
+    
+    public init(configuration: Configuration) {
+        self.configuration = configuration
+    }
+    
+    public convenience init(token: String) {
+        self.init(configuration: .init(token: token))
     }
     
     // Chats
@@ -46,12 +58,12 @@ public final class AnthropicClient {
     // Private
     
     private func makeRequest(path: String, method: String) -> URLRequest {
-        var req = URLRequest(url: host.appending(path: path))
+        var req = URLRequest(url: configuration.host.appending(path: path))
         req.httpMethod = method
         req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         req.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         req.setValue("messages-2023-12-15", forHTTPHeaderField: "anthropic-beta")
-        req.setValue(token, forHTTPHeaderField: "x-api-key")
+        req.setValue(configuration.token, forHTTPHeaderField: "x-api-key")
         return req
     }
     
