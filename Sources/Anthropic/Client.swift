@@ -50,6 +50,7 @@ public final class AnthropicClient {
         .init(
             models: [
                 "claude-2.1",
+                "claude-2.0",
                 "claude-instant-1.2",
             ]
         )
