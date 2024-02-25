@@ -11,6 +11,20 @@ public struct ChatRequest: Codable {
     public var stopSequences: [String]?
     public var stream: Bool?
     public var metadata: Metadata?
+
+    public struct Message: Codable {
+        public var role: Role
+        public var content: String
+        
+        public enum Role: String, Codable {
+            case assistant, user
+        }
+        
+        public init(role: Role, content: String) {
+            self.role = role
+            self.content = content
+        }
+    }
     
     public struct Metadata: Codable {
         public var userID: String
@@ -53,14 +67,29 @@ public struct ChatResponse: Codable {
     public let id: String
     public let model: String
     public let type: String?
-    public let role: Message.Role
+    public let role: Role
     public let content: [Content]
     public let stopReason: String?
     public let stopSequence: String?
+    public let usage: Usage
+    
+    public enum Role: String, Codable {
+        case assistant, user
+    }
     
     public struct Content: Codable {
         public let type: String
         public let text: String
+    }
+    
+    public struct Usage: Codable {
+        public let inputTokens: Int
+        public let outputTokens: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case inputTokens = "input_tokens"
+            case outputTokens = "output_tokens"
+        }
     }
     
     enum CodingKeys: String, CodingKey {
@@ -71,19 +100,29 @@ public struct ChatResponse: Codable {
         case content
         case stopReason = "stop_reason"
         case stopSequence = "stop_sequence"
+        case usage
     }
 }
 
-public struct Message: Codable {
-    public var role: Role
-    public var content: String
+public struct ChatStreamResponse: Codable {
+    public let type: String
+    public let index: Int?
+    public let message: ChatResponse?
+    public let delta: Delta?
+    public let contentBlock: Delta?
     
-    public enum Role: String, Codable {
-        case assistant, user
+    public struct Delta: Codable {
+        public let type: String?
+        public let text: String?
+        public let stopReason: String?
+        public let stopSequence: String?
     }
     
-    public init(role: Role, content: String) {
-        self.role = role
-        self.content = content
+    enum CodingKeys: String, CodingKey {
+        case type
+        case index
+        case message
+        case delta
+        case contentBlock = "content_block"
     }
 }

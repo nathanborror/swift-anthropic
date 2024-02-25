@@ -40,15 +40,20 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
             onProcessingError?(self, StreamingError.unknownContent)
             return
         }
-        let jsonObjects = stringContent
-            .components(separatedBy: "data:")
-            .filter { $0.isEmpty == false }
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         
-        guard jsonObjects.isEmpty == false, jsonObjects.first != streamingCompletionMarker else {
+        var jsonObjects = [String]()
+        let lines = stringContent.components(separatedBy: .newlines)
+        for line in lines {
+            if line.hasPrefix("data:") {
+                let obj = line.trimmingPrefix("data:").trimmingCharacters(in: .whitespacesAndNewlines)
+                jsonObjects.append(obj)
+            }
+        }
+        
+        guard jsonObjects.isEmpty == false else {
             return
         }
-        jsonObjects.forEach { jsonContent  in
+        jsonObjects.forEach { jsonContent in
             guard jsonContent != streamingCompletionMarker else {
                 return
             }

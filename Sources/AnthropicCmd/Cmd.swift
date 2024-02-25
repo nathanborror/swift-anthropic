@@ -1,3 +1,4 @@
+import Foundation
 import ArgumentParser
 import Anthropic
 
@@ -44,7 +45,13 @@ struct ChatStreamCompletion: AsyncParsableCommand {
     @OptionGroup var options: Options
     
     func run() async throws {
-        print("chat.stream.completion")
-        print(options.prompt, options.token)
+        let client = AnthropicClient(token: options.token)
+        let payload = ChatRequest(model: options.model, messages: [.init(role: .user, content: options.prompt)])
+        let stream: AsyncThrowingStream<ChatStreamResponse, Error> = client.chatStream(payload)
+        for try await result in stream {
+            if let content = result.delta?.text, let data = content.data(using: .utf8) {
+                try FileHandle.standardOutput.write(contentsOf: data)
+            }
+        }
     }
 }

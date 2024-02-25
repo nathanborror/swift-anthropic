@@ -38,7 +38,7 @@ public final class AnthropicClient {
         return try decoder.decode(ChatResponse.self, from: data)
     }
     
-    public func chatStream(_ payload: ChatRequest) -> AsyncThrowingStream<ChatResponse, Error> {
+    public func chatStream(_ payload: ChatRequest) -> AsyncThrowingStream<ChatStreamResponse, Error> {
         var body = payload
         body.stream = true
         return makeAsyncRequest(path: "messages", method: "POST", body: body)
