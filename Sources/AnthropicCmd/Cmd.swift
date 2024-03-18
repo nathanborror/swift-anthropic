@@ -33,7 +33,7 @@ struct ChatCompletion: AsyncParsableCommand {
     
     func run() async throws {
         let client = AnthropicClient(token: options.token)
-        let payload = ChatRequest(model: options.model, messages: [.init(role: .user, content: options.prompt)])
+        let payload = ChatRequest(model: options.model, messages: [.init(role: .user, content: [.init(type: .text, text: options.prompt)])])
         let message = try await client.chat(payload)
         print(message.content.first?.text ?? "")
     }
@@ -46,7 +46,7 @@ struct ChatStreamCompletion: AsyncParsableCommand {
     
     func run() async throws {
         let client = AnthropicClient(token: options.token)
-        let payload = ChatRequest(model: options.model, messages: [.init(role: .user, content: options.prompt)])
+        let payload = ChatRequest(model: options.model, messages: [.init(role: .user, content: [.init(type: .text, text: options.prompt)])])
         let stream: AsyncThrowingStream<ChatStreamResponse, Error> = client.chatStream(payload)
         for try await result in stream {
             if let content = result.delta?.text, let data = content.data(using: .utf8) {

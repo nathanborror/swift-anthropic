@@ -14,13 +14,58 @@ public struct ChatRequest: Codable {
 
     public struct Message: Codable {
         public var role: Role
-        public var content: String
+        public var content: [Content]
         
         public enum Role: String, Codable {
             case assistant, user
         }
         
-        public init(role: Role, content: String) {
+        public struct Content: Codable {
+            public var type: ContentType
+            public var text: String?
+            public var source: Source?
+            
+            public enum ContentType: String, Codable {
+                case text, image
+            }
+            
+            public struct Source: Codable {
+                public var type: SourceType
+                public var mediaType: MediaType
+                public var data: Data
+                
+                public enum SourceType: String, Codable {
+                    case base64
+                }
+                
+                public enum MediaType: String, Codable {
+                    case jpeg = "image/jpeg"
+                    case png = "image/png"
+                    case gif = "image/gif"
+                    case webp = "image/webp"
+                }
+                
+                enum CodingKeys: String, CodingKey {
+                    case type
+                    case mediaType = "media_type"
+                    case data
+                }
+                
+                public init(type: SourceType, mediaType: MediaType, data: Data) {
+                    self.type = type
+                    self.mediaType = mediaType
+                    self.data = data
+                }
+            }
+            
+            public init(type: ContentType, text: String? = nil, source: Source? = nil) {
+                self.type = type
+                self.text = text
+                self.source = source
+            }
+        }
+        
+        public init(role: Role, content: [Content]) {
             self.role = role
             self.content = content
         }
@@ -79,7 +124,7 @@ public struct ChatResponse: Codable {
     
     public struct Content: Codable {
         public let type: String
-        public let text: String
+        public let text: String?
     }
     
     public struct Usage: Codable {
