@@ -18,10 +18,6 @@ public struct ChatRequest: Codable {
         public var role: Role
         public var content: [Content]
         
-        public enum Role: String, Codable {
-            case assistant, user
-        }
-        
         public struct Content: Codable {
             public var type: ContentType
             public var text: String?
@@ -30,7 +26,7 @@ public struct ChatRequest: Codable {
             public var source: Source?
             
             public enum ContentType: String, Codable {
-                case text, image, tool_result
+                case text, image, tool_result, tool_use
             }
             
             public struct Source: Codable {
@@ -152,14 +148,6 @@ public struct ChatResponse: Codable {
     public let stopSequence: String?
     public let usage: Usage
     
-    public enum Role: String, Codable {
-        case assistant, user
-    }
-    
-    public enum StopReason: String, Codable {
-        case end_turn, max_tokens, stop_sequence, tool_use
-    }
-    
     public struct Content: Codable {
         public let type: ContentType
         public let id: String?
@@ -204,8 +192,15 @@ public struct ChatStreamResponse: Codable {
     public struct Delta: Codable {
         public let type: String?
         public let text: String?
-        public let stopReason: String?
+        public let stopReason: StopReason?
         public let stopSequence: String?
+        
+        enum CodingKeys: String, CodingKey {
+            case type
+            case text
+            case stopReason = "stop_reason"
+            case stopSequence = "stop_sequence"
+        }
     }
     
     enum CodingKeys: String, CodingKey {
@@ -215,4 +210,12 @@ public struct ChatStreamResponse: Codable {
         case delta
         case contentBlock = "content_block"
     }
+}
+
+public enum Role: String, Codable {
+    case assistant, user
+}
+
+public enum StopReason: String, Codable {
+    case end_turn, max_tokens, stop_sequence, tool_use
 }
