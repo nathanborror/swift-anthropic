@@ -6,7 +6,16 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "6c7ec363da47357aaf1f2f423d30117ff077f696"
+        "revision" : "46989693916f56d1186bd59ac15124caef896560"
+      }
+    },
+    {
+      "identity" : "swift-shared-kit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/swift-shared-kit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f026d3cd37fac84f99141346a2a4447e000f3078"
       }
     }
   ],

@@ -11,6 +11,7 @@ struct Cmd: AsyncParsableCommand {
         subcommands: [
             ChatCompletion.self,
             ChatStreamCompletion.self,
+            ToolCompletion.self,
         ]
     )
 }
@@ -53,5 +54,38 @@ struct ChatStreamCompletion: AsyncParsableCommand {
                 try FileHandle.standardOutput.write(contentsOf: data)
             }
         }
+    }
+}
+
+struct ToolCompletion: AsyncParsableCommand {
+    static var configuration = CommandConfiguration(abstract: "Completes a tool request.")
+    
+    @OptionGroup var options: Options
+    
+    func run() async throws {
+        let client = AnthropicClient(configuration: .init(token: options.token, beta: "tools-2024-04-04"))
+        let payload = ChatRequest(
+            model: options.model,
+            messages: [
+                .init(role: .user, content: [.init(type: .text, text: options.prompt)])
+            ],
+            tools: [
+                .init(
+                    name: "get_weather", 
+                    description: "Get the current weather in a given location",
+                    inputSchema: .init(
+                        type: .object,
+                        properties: [
+                            "location": .init(type: .string, description: "The city and state, e.g. San Francisco, CA")
+                        ], 
+                        required: ["location"]
+                    )
+                )
+            ]
+        )
+        let message = try await client.chat(payload)
+        print(message.content.first?.text ?? "")
+        print("---")
+        print(message)
     }
 }

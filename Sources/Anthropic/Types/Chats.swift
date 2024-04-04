@@ -1,4 +1,5 @@
 import Foundation
+import SharedKit
 
 public struct ChatRequest: Codable {
     public var model: String
@@ -6,6 +7,7 @@ public struct ChatRequest: Codable {
     public var system: String?
     public var maxTokens: Int
     public var temperature: Float?
+    public var tools: [Tool]?
     public var topP: Float?
     public var topK: UInt?
     public var stopSequences: [String]?
@@ -23,10 +25,12 @@ public struct ChatRequest: Codable {
         public struct Content: Codable {
             public var type: ContentType
             public var text: String?
+            public var content: [Content]? // This is weird
+            public var toolUseID: String?
             public var source: Source?
             
             public enum ContentType: String, Codable {
-                case text, image
+                case text, image, tool_result
             }
             
             public struct Source: Codable {
@@ -58,9 +62,19 @@ public struct ChatRequest: Codable {
                 }
             }
             
-            public init(type: ContentType, text: String? = nil, source: Source? = nil) {
+            enum CodingKeys: String, CodingKey {
+                case type
+                case text
+                case content
+                case toolUseID = "tool_use_id"
+                case source
+            }
+            
+            public init(type: ContentType, text: String? = nil, content: [Content]? = nil, toolUseID: String? = nil, source: Source? = nil) {
                 self.type = type
                 self.text = text
+                self.content = content
+                self.toolUseID = toolUseID
                 self.source = source
             }
         }
@@ -68,6 +82,24 @@ public struct ChatRequest: Codable {
         public init(role: Role, content: [Content]) {
             self.role = role
             self.content = content
+        }
+    }
+    
+    public struct Tool: Codable {
+        public var name: String
+        public var description: String
+        public var inputSchema: JSONSchema
+        
+        enum CodingKeys: String, CodingKey {
+            case name
+            case description
+            case inputSchema = "input_schema"
+        }
+        
+        public init(name: String, description: String, inputSchema: JSONSchema) {
+            self.name = name
+            self.description = description
+            self.inputSchema = inputSchema
         }
     }
     
@@ -85,6 +117,7 @@ public struct ChatRequest: Codable {
         case system
         case maxTokens = "max_tokens"
         case temperature
+        case tools
         case topP = "top_p"
         case topK = "top_k"
         case stopSequences = "stop_sequences"
@@ -93,13 +126,14 @@ public struct ChatRequest: Codable {
     }
     
     public init(model: String, messages: [Message], system: String? = nil, maxTokens: Int = 1024, 
-                temperature: Float? = nil, topP: Float? = nil, topK: UInt? = nil, stopSequences: [String]? = nil,
-                stream: Bool? = nil, metadata: Metadata? = nil) {
+                temperature: Float? = nil, tools: [Tool]? = nil, topP: Float? = nil, topK: UInt? = nil,
+                stopSequences: [String]? = nil, stream: Bool? = nil, metadata: Metadata? = nil) {
         self.model = model
         self.messages = messages
         self.system = system
         self.maxTokens = maxTokens
         self.temperature = temperature
+        self.tools = tools
         self.topP = topP
         self.topK = topK
         self.stopSequences = stopSequences
@@ -114,7 +148,7 @@ public struct ChatResponse: Codable {
     public let type: String?
     public let role: Role
     public let content: [Content]
-    public let stopReason: String?
+    public let stopReason: StopReason?
     public let stopSequence: String?
     public let usage: Usage
     
@@ -122,9 +156,20 @@ public struct ChatResponse: Codable {
         case assistant, user
     }
     
+    public enum StopReason: String, Codable {
+        case end_turn, max_tokens, stop_sequence, tool_use
+    }
+    
     public struct Content: Codable {
-        public let type: String
+        public let type: ContentType
+        public let id: String?
+        public let name: String?
         public let text: String?
+        public let input: [String: AnyValue]?
+        
+        public enum ContentType: String, Codable {
+            case text, tool_use
+        }
     }
     
     public struct Usage: Codable {
