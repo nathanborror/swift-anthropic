@@ -14,6 +14,7 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
     var onProcessingError: ((StreamingSession, Error) -> Void)?
     var onComplete: ((StreamingSession, Error?) -> Void)?
     
+    private var streamingBuffer = ""
     private let streamingCompletionMarker = "[DONE]"
     private let urlRequest: URLRequest
     private lazy var urlSession: URLSession = {
@@ -42,18 +43,24 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
         }
         
         var jsonObjects = [String]()
-        let lines = stringContent.components(separatedBy: .newlines)
+        let lines = "\(streamingBuffer)\(stringContent)".components(separatedBy: .newlines)
         for line in lines {
             if line.hasPrefix("data:") {
                 let obj = line.trimmingPrefix("data:").trimmingCharacters(in: .whitespacesAndNewlines)
                 jsonObjects.append(obj)
+            } else if line.hasPrefix("event:") { // ignore events
+                continue
+            } else if line.hasPrefix("{") { // probably an error
+                jsonObjects.append(line)
             }
         }
+        
+        streamingBuffer = ""
         
         guard jsonObjects.isEmpty == false else {
             return
         }
-        jsonObjects.forEach { jsonContent in
+        jsonObjects.enumerated().forEach { (index, jsonContent)  in
             guard jsonContent != streamingCompletionMarker else {
                 return
             }
@@ -65,7 +72,11 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
                 let object = try decoder.decode(ResultType.self, from: jsonData)
                 onReceiveContent?(self, object)
             } catch {
-                onProcessingError?(self, error)
+                if index == jsonObjects.count - 1 {
+                    streamingBuffer = "data: \(jsonContent)" // Chunk ends in a partial JSON
+                } else {
+                    onProcessingError?(self, error)
+                }
             }
         }
     }

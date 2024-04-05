@@ -156,6 +156,7 @@ public struct ChatResponse: Codable {
     public let stopReason: StopReason?
     public let stopSequence: String?
     public let usage: Usage
+    public let error: APIError?
     
     public struct Content: Codable {
         public let type: ContentType
@@ -188,6 +189,7 @@ public struct ChatResponse: Codable {
         case stopReason = "stop_reason"
         case stopSequence = "stop_sequence"
         case usage
+        case error
     }
 }
 
@@ -197,6 +199,7 @@ public struct ChatStreamResponse: Codable {
     public let message: ChatResponse?
     public let delta: Delta?
     public let contentBlock: Delta?
+    public let error: APIError?
     
     public struct Delta: Codable {
         public let type: String?
@@ -218,6 +221,7 @@ public struct ChatStreamResponse: Codable {
         case message
         case delta
         case contentBlock = "content_block"
+        case error
     }
 }
 
