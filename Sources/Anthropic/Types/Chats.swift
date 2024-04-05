@@ -23,6 +23,9 @@ public struct ChatRequest: Codable {
             public var text: String?
             public var content: [Content]? // This is weird
             public var toolUseID: String?
+            public var id: String?
+            public var name: String?
+            public var input: [String: AnyValue]?
             public var source: Source?
             
             public enum ContentType: String, Codable {
@@ -63,14 +66,20 @@ public struct ChatRequest: Codable {
                 case text
                 case content
                 case toolUseID = "tool_use_id"
+                case id
+                case name
+                case input
                 case source
             }
             
-            public init(type: ContentType, text: String? = nil, content: [Content]? = nil, toolUseID: String? = nil, source: Source? = nil) {
+            public init(type: ContentType, text: String? = nil, content: [Content]? = nil, toolUseID: String? = nil, id: String? = nil, name: String? = nil, input: [String : AnyValue]? = nil, source: Source? = nil) {
                 self.type = type
                 self.text = text
                 self.content = content
                 self.toolUseID = toolUseID
+                self.id = id
+                self.name = name
+                self.input = input
                 self.source = source
             }
         }
