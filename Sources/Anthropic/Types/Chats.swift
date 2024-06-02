@@ -202,7 +202,7 @@ public struct ChatStreamResponse: Codable {
     public let error: APIError?
     
     public struct Delta: Codable {
-        public let type: String?
+        public let type: String
         public let text: String?
         public let partialJSON: String?
         public let stopReason: StopReason?
