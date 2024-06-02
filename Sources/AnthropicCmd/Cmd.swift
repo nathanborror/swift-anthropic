@@ -36,7 +36,7 @@ struct ChatCompletion: AsyncParsableCommand {
         let client = AnthropicClient(token: options.token)
         let payload = ChatRequest(model: options.model, messages: [.init(role: .user, content: [.init(type: .text, text: options.prompt)])])
         let message = try await client.chat(payload)
-        print(message.content.first?.text ?? "")
+        print(message.content?.first?.text ?? "")
     }
 }
 
@@ -84,7 +84,7 @@ struct ToolCompletion: AsyncParsableCommand {
             ]
         )
         let message = try await client.chat(payload)
-        print(message.content.first?.text ?? "")
+        print(message.content?.first?.text ?? "")
         print("---")
         print(message)
     }

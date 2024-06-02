@@ -35,7 +35,11 @@ public final class AnthropicClient {
         
         let (data, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
-            throw URLError(.badServerResponse)
+            if let result = try? decoder.decode(ChatResponse.self, from: data), let error = result.error {
+                throw error
+            } else {
+                throw URLError(.badServerResponse)
+            }
         }
         return try decoder.decode(ChatResponse.self, from: data)
     }

@@ -148,14 +148,14 @@ public struct ChatRequest: Codable {
 }
 
 public struct ChatResponse: Codable {
-    public let id: String
-    public let model: String
-    public let type: String?
-    public let role: Role
-    public let content: [Content]
+    public let type: String
+    public let id: String?
+    public let model: String?
+    public let role: Role?
+    public let content: [Content]?
     public let stopReason: StopReason?
     public let stopSequence: String?
-    public let usage: Usage
+    public let usage: Usage?
     public let error: APIError?
     
     public struct Content: Codable {
