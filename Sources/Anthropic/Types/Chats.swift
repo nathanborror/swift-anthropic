@@ -198,21 +198,30 @@ public struct ChatStreamResponse: Codable {
     public let index: Int?
     public let message: ChatResponse?
     public let delta: Delta?
-    public let contentBlock: Delta?
+    public let contentBlock: ContentBlock?
     public let error: APIError?
     
     public struct Delta: Codable {
         public let type: String?
         public let text: String?
+        public let partialJSON: String?
         public let stopReason: StopReason?
         public let stopSequence: String?
         
         enum CodingKeys: String, CodingKey {
             case type
             case text
+            case partialJSON = "partial_json"
             case stopReason = "stop_reason"
             case stopSequence = "stop_sequence"
         }
+    }
+    
+    public struct ContentBlock: Codable {
+        public let type: String
+        public let text: String?
+        public let id: String?
+        public let name: String?
     }
     
     enum CodingKeys: String, CodingKey {
