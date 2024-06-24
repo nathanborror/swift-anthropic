@@ -66,7 +66,7 @@ struct ChatCompletion: AsyncParsableCommand {
     
     func run() async throws {
         let client = AnthropicClient(token: global.key)
-        var messages: [ChatRequestMessage] = []
+        var messages: [ChatRequest.Message] = []
         
         write("\nUsing \(global.model)\n\n")
         
@@ -98,11 +98,11 @@ struct ChatCompletion: AsyncParsableCommand {
                     message = resp.apply(to: message)
                 }
                 newline()
-                let content = message?.content?.map { ChatRequestMessage.Content(content: $0) }
+                let content = message?.content?.map { ChatRequest.Message.Content(content: $0) }
                 messages.append(.init(role: .assistant, content: content ?? []))
             } else {
                 let resp = try await client.chat(req)
-                let content = resp.content?.map { ChatRequestMessage.Content(content: $0) }
+                let content = resp.content?.map { ChatRequest.Message.Content(content: $0) }
                 messages.append(.init(role: .assistant, content: content ?? []))
                 
                 for content in resp.content ?? [] {
@@ -137,7 +137,7 @@ struct ChatCompletionStream: AsyncParsableCommand {
     
     func run() async throws {
         let client = AnthropicClient(token: global.key)
-        let messages: [ChatRequestMessage] = [.init(role: .user, content: [.init(type: .text, text: content)])]
+        let messages: [ChatRequest.Message] = [.init(role: .user, content: [.init(type: .text, text: content)])]
         let req = ChatRequest(
             model: global.model,
             messages: messages,
@@ -164,8 +164,8 @@ struct ChatCompletionWithTool: AsyncParsableCommand {
     var content: String
     
     func run() async throws {
-        let messages: [ChatRequestMessage] = [.init(role: .user, content: [.init(type: .text, text: content)])]
         let client = AnthropicClient(configuration: .init(token: global.key))
+        let messages: [ChatRequest.Message] = [.init(role: .user, content: [.init(type: .text, text: content)])]
         let tools: [ChatRequest.Tool] = [
             .init(
                 name: "get_weather",
