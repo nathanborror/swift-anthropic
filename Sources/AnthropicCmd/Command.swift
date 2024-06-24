@@ -68,10 +68,10 @@ struct ChatCompletion: AsyncParsableCommand {
         let client = AnthropicClient(token: global.key)
         var messages: [ChatRequestMessage] = []
         
-        print("\nUsing \(global.model)")
+        write("\nUsing \(global.model)\n\n")
         
         if let system = global.system {
-            print("\n<system>\n\(system)\n</system>\n")
+            write("\n<system>\n\(system)\n</system>\n\n")
         }
         
         while true {
@@ -92,42 +92,22 @@ struct ChatCompletion: AsyncParsableCommand {
             )
 
             if stream {
-                var message: ChatResponse!
+                var message: ChatResponse? = nil
                 for try await resp in client.chatStream(req) {
-                    switch resp.type {
-                    case .ping, .error, .message_delta, .message_stop:
-                        break
-                    case .message_start:
-                        message = resp.message!
-                        message.content = []
-                    case .content_block_start:
-                        if let content = resp.contentBlock {
-                            message.content!.append(content)
-                        }
-                    case .content_block_delta:
-                        if let index = resp.index {
-                            let existing = message.content![index]
-                            message.content![index] = existing.apply(content: resp.delta)
-                            write(resp.delta?.text ?? "")
-                        }
-                    case .content_block_stop:
-                        if let index = resp.index {
-                            var existing = message.content![index]
-                            if existing.type == .tool_use, let data = existing.partialJSON?.data(using: .utf8) {
-                                existing.input = try? JSONDecoder().decode([String: AnyValue].self, from: data)
-                            }
-                            message.content![index] = existing
-                            newline()
-                        }
-                    }
+                    write(resp.delta?.text)
+                    message = resp.apply(to: message)
                 }
-                let content = message.content!.map { ChatRequestMessage.Content(type: .text, text: $0.text) }
-                messages.append(.init(role: .assistant, content: content))
+                newline()
+                let content = message?.content?.map { ChatRequestMessage.Content(content: $0) }
+                messages.append(.init(role: .assistant, content: content ?? []))
             } else {
                 let resp = try await client.chat(req)
-                let text = resp.content?.first?.text ?? ""
-                messages.append(.init(role: .assistant, content: [.init(type: .text, text: text)]))
-                write(text); newline()
+                let content = resp.content?.map { ChatRequestMessage.Content(content: $0) }
+                messages.append(.init(role: .assistant, content: content ?? []))
+                
+                for content in resp.content ?? [] {
+                    write(content.text); newline()
+                }
             }
         }
     }

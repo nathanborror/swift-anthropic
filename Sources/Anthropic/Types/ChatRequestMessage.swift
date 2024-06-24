@@ -7,13 +7,20 @@ public struct ChatRequestMessage: Codable {
     
     public struct Content: Codable {
         public var type: ContentType
-        public var text: String?
-        public var content: [Content]? // This is weird
-        public var toolUseID: String?
         public var id: String?
+        public var text: String?
+        
+        // Image
+        public var source: Source?
+        
+        // Tool Use
         public var name: String?
         public var input: [String: AnyValue]?
-        public var source: Source?
+        
+        // Tool Result
+        public var toolUseID: String?
+        public var content: [Content]? // This is weird
+        public var isError: Bool?
         
         public enum ContentType: String, Codable {
             case text, image, tool_result, tool_use
@@ -57,6 +64,7 @@ public struct ChatRequestMessage: Codable {
             case name
             case input
             case source
+            case isError = "is_error"
         }
         
         public init(type: ContentType, text: String? = nil, content: [Content]? = nil, toolUseID: String? = nil, id: String? = nil, name: String? = nil, input: [String : AnyValue]? = nil, source: Source? = nil) {
@@ -68,6 +76,23 @@ public struct ChatRequestMessage: Codable {
             self.name = name
             self.input = input
             self.source = source
+        }
+        
+        public init(content: ChatResponse.Content) {
+            self.text = content.text
+            self.content = nil
+            self.toolUseID = nil
+            self.id = content.id
+            self.name = content.name
+            self.input = content.input
+            self.source = nil
+            
+            switch content.type {
+            case .text, .text_delta, .none:
+                self.type = .text
+            case .tool_use, .input_json_delta:
+                self.type = .tool_use
+            }
         }
     }
     

@@ -12,6 +12,31 @@ public struct ChatResponse: Codable {
     public var usage: Usage?
     public var error: APIError?
     
+    public struct Content: Codable {
+        public var type: ContentType?
+        public var id: String?
+        public var name: String?
+        public var text: String?
+        public var input: [String: AnyValue]?
+        public var partialJSON: String?
+        
+        public enum ContentType: String, Codable {
+            case text
+            case text_delta
+            case tool_use
+            case input_json_delta
+        }
+        
+        enum CodingKeys: String, CodingKey {
+            case type
+            case id
+            case name
+            case text
+            case input
+            case partialJSON = "partial_json"
+        }
+    }
+    
     public struct Usage: Codable {
         public var inputTokens: Int
         public var outputTokens: Int
@@ -32,5 +57,20 @@ public struct ChatResponse: Codable {
         case stopSequence = "stop_sequence"
         case usage
         case error
+    }
+}
+
+extension ChatResponse.Content {
+    
+    public func apply(content: ChatResponse.Content?) -> ChatResponse.Content {
+        guard let content else { return self }
+        var out = self
+        if let text = out.text, let delta = content.text {
+            out.text = text + delta
+        }
+        if let json = out.partialJSON, let delta = content.partialJSON {
+            out.partialJSON = json + delta
+        }
+        return out
     }
 }
