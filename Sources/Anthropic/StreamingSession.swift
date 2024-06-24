@@ -50,8 +50,6 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
                 jsonObjects.append(obj)
             } else if line.hasPrefix("event:") { // ignore events
                 continue
-            } else if line.hasPrefix("{") { // probably an error
-                jsonObjects.append(line)
             }
         }
         
