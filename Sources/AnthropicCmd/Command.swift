@@ -4,7 +4,7 @@ import Anthropic
 import SharedKit
 
 @main
-struct Anthropic: AsyncParsableCommand {
+struct Command: AsyncParsableCommand {
     
     static var configuration = CommandConfiguration(
         abstract: "A utility for interacting with the Anthropic API.",
