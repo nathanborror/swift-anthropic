@@ -5,12 +5,10 @@ public final class AnthropicClient {
     public struct Configuration {
         public let host: URL
         public let token: String
-        public let beta: String?
         
-        public init(host: URL = URL(string: "https://api.anthropic.com/v1")!, token: String, beta: String? = nil) {
+        public init(host: URL = URL(string: "https://api.anthropic.com/v1")!, token: String) {
             self.host = host
             self.token = token
-            self.beta = beta
         }
     }
     
@@ -74,9 +72,6 @@ public final class AnthropicClient {
         req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         req.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         req.setValue(configuration.token, forHTTPHeaderField: "x-api-key")
-        if let beta = configuration.beta {
-            req.setValue(beta, forHTTPHeaderField: "anthropic-beta")
-        }
         return req
     }
     

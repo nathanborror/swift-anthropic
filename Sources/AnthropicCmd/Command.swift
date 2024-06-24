@@ -164,8 +164,8 @@ struct ChatCompletionWithTool: AsyncParsableCommand {
     var content: String
     
     func run() async throws {
-        let client = AnthropicClient(configuration: .init(token: global.key, beta: "tools-2024-04-04"))
         let messages: [ChatRequestMessage] = [.init(role: .user, content: [.init(type: .text, text: content)])]
+        let client = AnthropicClient(configuration: .init(token: global.key))
         let tools: [ChatRequest.Tool] = [
             .init(
                 name: "get_weather",
