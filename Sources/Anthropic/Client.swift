@@ -55,13 +55,13 @@ public final class AnthropicClient {
     public func models() async throws -> ModelListResponse {
         .init(
             models: [
-                "claude-3-5-sonnet-20240620",
-                "claude-3-opus-20240229",
-                "claude-3-sonnet-20240229",
-                "claude-3-haiku-20240307",
-                "claude-2.1",
-                "claude-2.0",
-                "claude-instant-1.2",
+                Constant.claudeOpus3,
+                Constant.claudeSonnet3_5,
+                Constant.claudeSonnet3,
+                Constant.claudeHaiku3,
+                Constant.claude2_1,
+                Constant.claude2,
+                Constant.claudeInstant1_2,
             ]
         )
     }
