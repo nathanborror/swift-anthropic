@@ -59,18 +59,3 @@ public struct ChatResponse: Codable {
         case error
     }
 }
-
-extension ChatResponse.Content {
-    
-    public func apply(content: ChatResponse.Content?) -> ChatResponse.Content {
-        guard let content else { return self }
-        var out = self
-        if let text = out.text, let delta = content.text {
-            out.text = text + delta
-        }
-        if let json = out.partialJSON, let delta = content.partialJSON {
-            out.partialJSON = json + delta
-        }
-        return out
-    }
-}
