@@ -71,6 +71,7 @@ public final class AnthropicClient {
         req.httpMethod = method
         req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         req.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
+        req.setValue("max-tokens-3-5-sonnet-2024-07-15", forHTTPHeaderField: "anthropic-beta")
         req.setValue(configuration.token, forHTTPHeaderField: "x-api-key")
         return req
     }
