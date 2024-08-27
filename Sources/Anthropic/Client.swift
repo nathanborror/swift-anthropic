@@ -6,8 +6,8 @@ public final class AnthropicClient {
         public let host: URL
         public let token: String
         
-        public init(host: URL = URL(string: "https://api.anthropic.com/v1")!, token: String) {
-            self.host = host
+        public init(host: URL? = nil, token: String) {
+            self.host = host ?? Defaults.apiHost
             self.token = token
         }
     }
@@ -16,10 +16,6 @@ public final class AnthropicClient {
     
     public init(configuration: Configuration) {
         self.configuration = configuration
-    }
-    
-    public convenience init(token: String) {
-        self.init(configuration: .init(token: token))
     }
     
     // Chats
@@ -51,17 +47,7 @@ public final class AnthropicClient {
     // Models
     
     public func models() async throws -> ModelListResponse {
-        .init(
-            models: [
-                Constant.claudeOpus3,
-                Constant.claudeSonnet3_5,
-                Constant.claudeSonnet3,
-                Constant.claudeHaiku3,
-                Constant.claude2_1,
-                Constant.claude2,
-                Constant.claudeInstant1_2,
-            ]
-        )
+        .init(models: Defaults.models)
     }
     
     // Private
@@ -70,9 +56,12 @@ public final class AnthropicClient {
         var req = URLRequest(url: configuration.host.appending(path: path))
         req.httpMethod = method
         req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-        req.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
-        req.setValue("max-tokens-3-5-sonnet-2024-07-15", forHTTPHeaderField: "anthropic-beta")
+        req.setValue(Defaults.apiVersion, forHTTPHeaderField: "anthropic-version")
         req.setValue(configuration.token, forHTTPHeaderField: "x-api-key")
+        
+        if let apiVersionBeta = Defaults.apiVersionBeta {
+            req.setValue(apiVersionBeta, forHTTPHeaderField: "anthropic-beta")
+        }
         return req
     }
     

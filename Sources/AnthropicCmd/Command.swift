@@ -24,7 +24,7 @@ struct GlobalOptions: ParsableCommand {
     var key: String
     
     @Option(name: .shortAndLong, help: "Model to use.")
-    var model = Constant.claudeHaiku3
+    var model = Defaults.chatModel
     
     @Option(name: .shortAndLong, help: "System prompt.")
     var systemPrompt: String?
@@ -46,7 +46,7 @@ struct Models: AsyncParsableCommand {
     var global: GlobalOptions
     
     func run() async throws {
-        let client = AnthropicClient(token: global.key)
+        let client = AnthropicClient(configuration: .init(token: global.key))
         let resp = try await client.models()
         print(resp.models.map { $0 }.joined(separator: "\n"))
     }
@@ -65,7 +65,7 @@ struct ChatCompletion: AsyncParsableCommand {
     var stream = false
     
     func run() async throws {
-        let client = AnthropicClient(token: global.key)
+        let client = AnthropicClient(configuration: .init(token: global.key))
         var messages: [ChatRequest.Message] = []
         
         write("\nUsing \(global.model)\n\n")
@@ -136,7 +136,7 @@ struct ChatCompletionStream: AsyncParsableCommand {
     var content: String
     
     func run() async throws {
-        let client = AnthropicClient(token: global.key)
+        let client = AnthropicClient(configuration: .init(token: global.key))
         let messages: [ChatRequest.Message] = [.init(role: .user, content: [.init(type: .text, text: content)])]
         let req = ChatRequest(
             model: global.model,
