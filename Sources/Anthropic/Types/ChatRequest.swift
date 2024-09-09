@@ -70,7 +70,7 @@ public struct ChatRequest: Codable {
         case metadata
     }
     
-    public init(model: String, messages: [Message], system: String? = nil, maxTokens: Int = 8192,
+    public init(model: String, messages: [Message], system: String? = nil, maxTokens: Int,
                 temperature: Float? = nil, tools: [Tool]? = nil, toolChoice: ToolChoice? = nil, topP: Float? = nil,
                 topK: UInt? = nil, stopSequences: [String]? = nil, stream: Bool? = nil, metadata: Metadata? = nil) {
         self.model = model

@@ -88,7 +88,8 @@ struct ChatCompletion: AsyncParsableCommand {
             let req = ChatRequest(
                 model: global.model,
                 messages: messages,
-                system: global.system
+                system: global.system,
+                maxTokens: 8192
             )
 
             if stream {
@@ -141,7 +142,8 @@ struct ChatCompletionStream: AsyncParsableCommand {
         let req = ChatRequest(
             model: global.model,
             messages: messages,
-            system: global.system
+            system: global.system,
+            maxTokens: 8192
         )
         for try await resp in client.chatStream(req) {
             if let text = resp.delta?.text, let data = text.data(using: .utf8) {
@@ -183,6 +185,7 @@ struct ChatCompletionWithTool: AsyncParsableCommand {
             model: global.model,
             messages: messages,
             system: global.system,
+            maxTokens: 8192,
             tools: tools
         )
         let resp = try await client.chat(req)
