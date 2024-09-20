@@ -21,6 +21,7 @@ public final class AnthropicClient {
     // Chats
     
     public func chat(_ payload: ChatRequest) async throws -> ChatResponse {
+        try checkAuthentication()
         var body = payload
         body.stream = nil
         
@@ -38,7 +39,8 @@ public final class AnthropicClient {
         return try decoder.decode(ChatResponse.self, from: data)
     }
     
-    public func chatStream(_ payload: ChatRequest) -> AsyncThrowingStream<ChatStreamResponse, Error> {
+    public func chatStream(_ payload: ChatRequest) throws -> AsyncThrowingStream<ChatStreamResponse, Error> {
+        try checkAuthentication()
         var body = payload
         body.stream = true
         return makeAsyncRequest(path: "messages", method: "POST", body: body)
@@ -47,10 +49,17 @@ public final class AnthropicClient {
     // Models
     
     public func models() async throws -> ModelListResponse {
-        .init(models: Defaults.models)
+        try checkAuthentication()
+        return .init(models: Defaults.models)
     }
     
     // Private
+    
+    private func checkAuthentication() throws {
+        if configuration.token.isEmpty {
+            throw URLError(.userAuthenticationRequired)
+        }
+    }
     
     private func makeRequest(path: String, method: String) -> URLRequest {
         var req = URLRequest(url: configuration.host.appending(path: path))
