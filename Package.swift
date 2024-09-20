@@ -16,8 +16,8 @@ let package = Package(
         .executable(name: "AnthropicCmd", targets: ["AnthropicCmd"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/nathanborror/swift-shared-kit", branch: "main"),
-        .package(url: "https://github.com/apple/swift-argument-parser", branch: "main"),
+        .package(url: "git@github.com:nathanborror/swift-shared-kit", branch: "main"),
+        .package(url: "git@github.com:apple/swift-argument-parser", branch: "main"),
     ],
     targets: [
         .target(name: "Anthropic", dependencies: [
