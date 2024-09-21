@@ -94,7 +94,7 @@ struct ChatCompletion: AsyncParsableCommand {
 
             if stream {
                 var message: ChatResponse? = nil
-                for try await resp in client.chatStream(req) {
+                for try await resp in try client.chatStream(req) {
                     write(resp.delta?.text)
                     message = resp.apply(to: message)
                 }
@@ -145,7 +145,7 @@ struct ChatCompletionStream: AsyncParsableCommand {
             system: global.system,
             maxTokens: 8192
         )
-        for try await resp in client.chatStream(req) {
+        for try await resp in try client.chatStream(req) {
             if let text = resp.delta?.text, let data = text.data(using: .utf8) {
                 try FileHandle.standardOutput.write(contentsOf: data)
             }
