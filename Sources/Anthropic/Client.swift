@@ -25,7 +25,7 @@ public final class AnthropicClient {
         var body = payload
         body.stream = nil
         
-        var req = makeRequest(path: "messages", method: "POST")
+        var req = makeRequest(path: "messages", method: "POST", beta: payload.beta)
         req.httpBody = try JSONEncoder().encode(body)
         
         let (data, resp) = try await URLSession.shared.data(for: req)
@@ -43,7 +43,7 @@ public final class AnthropicClient {
         try checkAuthentication()
         var body = payload
         body.stream = true
-        return makeAsyncRequest(path: "messages", method: "POST", body: body)
+        return makeAsyncRequest(path: "messages", method: "POST", beta: payload.beta, body: body)
     }
     
     // Models
@@ -61,21 +61,21 @@ public final class AnthropicClient {
         }
     }
     
-    private func makeRequest(path: String, method: String) -> URLRequest {
+    private func makeRequest(path: String, method: String, beta: String? = nil) -> URLRequest {
         var req = URLRequest(url: configuration.host.appending(path: path))
         req.httpMethod = method
         req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         req.setValue(Defaults.apiVersion, forHTTPHeaderField: "anthropic-version")
         req.setValue(configuration.token, forHTTPHeaderField: "x-api-key")
         
-        if let apiVersionBeta = Defaults.apiVersionBeta {
+        if let apiVersionBeta = beta ?? Defaults.apiVersionBeta {
             req.setValue(apiVersionBeta, forHTTPHeaderField: "anthropic-beta")
         }
         return req
     }
     
-    private func makeAsyncRequest<Body: Codable, Response: Codable>(path: String, method: String, body: Body) -> AsyncThrowingStream<Response, Error> {
-        var request = makeRequest(path: path, method: method)
+    private func makeAsyncRequest<Body: Codable, Response: Codable>(path: String, method: String, beta: String? = nil, body: Body) -> AsyncThrowingStream<Response, Error> {
+        var request = makeRequest(path: path, method: method, beta: beta)
         request.httpBody = try? JSONEncoder().encode(body)
         
         return AsyncThrowingStream { continuation in

@@ -14,6 +14,7 @@ public struct ChatRequest: Codable {
     public var stopSequences: [String]?
     public var stream: Bool?
     public var metadata: Metadata?
+    public var beta: String?
 
     public struct Tool: Codable {
         public var name: String
@@ -72,7 +73,7 @@ public struct ChatRequest: Codable {
     
     public init(model: String, messages: [Message], system: String? = nil, maxTokens: Int,
                 temperature: Float? = nil, tools: [Tool]? = nil, toolChoice: ToolChoice? = nil, topP: Float? = nil,
-                topK: UInt? = nil, stopSequences: [String]? = nil, stream: Bool? = nil, metadata: Metadata? = nil) {
+                topK: UInt? = nil, stopSequences: [String]? = nil, stream: Bool? = nil, metadata: Metadata? = nil, beta: String? = nil) {
         self.model = model
         self.messages = messages
         self.system = system
@@ -84,5 +85,6 @@ public struct ChatRequest: Codable {
         self.stopSequences = stopSequences
         self.stream = stream
         self.metadata = metadata
+        self.beta = beta
     }
 }
