@@ -10,26 +10,15 @@ public final class Client {
     public let apiKey: String
     public let apiVersion: String
     public let betaHeader: String?
-    public let userAgent: String?
 
     internal(set) public var session: URLSession
 
-    public init(session: URLSession = URLSession(configuration: .default),
-                host: URL = defaultHost,
-                apiKey: String,
-                apiVersion: String = defaultApiVersion,
-                betaHeader: String? = defaultBetaHeader,
-                userAgent: String? = nil) {
-        var host = host
-        if !host.path.hasSuffix("/") {
-            host = host.appendingPathComponent("")
-        }
-        self.host = host
-        self.apiKey = apiKey
-        self.apiVersion = apiVersion
-        self.betaHeader = betaHeader
-        self.userAgent = userAgent
+    public init(session: URLSession = URLSession(configuration: .default), host: URL? = nil, apiKey: String, apiVersion: String? = nil, betaHeader: String? = nil) {
         self.session = session
+        self.host = host ?? Self.defaultHost
+        self.apiKey = apiKey
+        self.apiVersion = apiVersion ?? Self.defaultApiVersion
+        self.betaHeader = betaHeader
     }
 
     public enum Error: Swift.Error, CustomStringConvertible {
