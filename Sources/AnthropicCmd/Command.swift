@@ -84,7 +84,7 @@ struct ChatCompletion: AsyncParsableCommand {
 
             let req = ChatRequest(model: global.model, messages: [message], max_tokens: 8192)
 
-            let resp = try await client.chat(req)
+            let resp = try await client.chatCompletions(req)
             let content = resp.content?.first?.text
             write(content); newline()
         }

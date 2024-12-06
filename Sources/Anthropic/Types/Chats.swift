@@ -69,3 +69,88 @@ public struct ChatRequest: Codable {
         self.top_p = top_p
     }
 }
+
+public struct ChatResponse: Codable {
+    public let id: String?
+    public let type: String?
+    public let role: Role?
+    public let content: [Content]?
+    public let model: String?
+    public let stop_reason: StopReason?
+    public let stop_sequence: String?
+    public let usage: Usage?
+
+    public enum Role: String, Codable {
+        case assistant
+        case user
+    }
+
+    public struct Content: Codable {
+        public let type: ContentType?
+
+        // Text
+        public let text: String?
+
+        // Tool Use
+        public let id: String?
+        public let name: String?
+        public let input: [String: AnyValue]?
+
+        // Streaming
+        public let partial_json: String?
+
+        public enum ContentType: String, Codable {
+            case text
+            case tool_use
+
+            // Streaming
+            case text_delta
+            case input_json_delta
+        }
+    }
+
+    public enum StopReason: String, Codable {
+        case end_turn
+        case max_tokens
+        case stop_sequence
+        case tool_use
+    }
+
+    public struct Usage: Codable {
+        public let input_tokens: Int?
+        public let cache_creation_input_tokens: Int?
+        public let cache_read_input_tokens: Int?
+        public let output_tokens: Int?
+    }
+}
+
+public struct ChatResponseStream: Codable {
+    public let type: EventType
+    public let index: Int?
+
+    public let message: ChatResponse?
+    public let delta: ChatResponse.Content?
+    public let content_block: ChatResponse.Content?
+
+    public let usage: ChatResponse.Usage?
+    public let error: ErrorResponse?
+
+    public enum EventType: String, Codable {
+        case ping
+        case error
+
+        case message_start
+        case message_delta
+        case message_stop
+
+        case content_block_start
+        case content_block_delta
+        case content_block_stop
+
+    }
+
+    public struct ErrorResponse: Codable {
+        public let type: String
+        public let message: String
+    }
+}

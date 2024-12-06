@@ -68,25 +68,6 @@ public final class Client {
     }
 }
 
-// MARK: - Chats
-
-extension Client {
-
-    public func chat(_ request: ChatRequest) async throws -> ChatResponse {
-        guard request.stream == nil || request.stream == false else {
-            throw Error.requestError("ChatRequest.stream cannot be set to 'true'")
-        }
-        return try await fetch(.post, "messages", body: request)
-    }
-
-    public func chatStream(_ request: ChatRequest) throws -> AsyncThrowingStream<ChatResponseStream, Swift.Error> {
-        guard request.stream == true else {
-            throw Error.requestError("ChatRequest.stream must be set to 'true'")
-        }
-        return try fetchAsync(.post, "messages", body: request)
-    }
-}
-
 // MARK: - Models
 
 extension Client {
@@ -130,6 +111,25 @@ extension Client {
                 maxOutput: 4096
             ),
         ])
+    }
+}
+
+// MARK: - Chats
+
+extension Client {
+
+    public func chatCompletions(_ request: ChatRequest) async throws -> ChatResponse {
+        guard request.stream == nil || request.stream == false else {
+            throw Error.requestError("ChatRequest.stream cannot be set to 'true'")
+        }
+        return try await fetch(.post, "messages", body: request)
+    }
+
+    public func chatCompletionsStream(_ request: ChatRequest) throws -> AsyncThrowingStream<ChatResponseStream, Swift.Error> {
+        guard request.stream == true else {
+            throw Error.requestError("ChatRequest.stream must be set to 'true'")
+        }
+        return try fetchAsync(.post, "messages", body: request)
     }
 }
 
