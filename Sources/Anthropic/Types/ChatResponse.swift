@@ -2,60 +2,55 @@ import Foundation
 import SharedKit
 
 public struct ChatResponse: Codable {
-    public var type: String
     public var id: String?
-    public var model: String?
+    public var type: String?
     public var role: Role?
     public var content: [Content]?
-    public var stopReason: StopReason?
-    public var stopSequence: String?
+    public var model: String?
+    public var stop_reason: StopReason?
+    public var stop_sequence: String?
     public var usage: Usage?
-    public var error: APIError?
+
+    public enum Role: String, Codable {
+        case assistant
+        case user
+    }
     
     public struct Content: Codable {
         public var type: ContentType?
+
+        // Text
+        public var text: String?
+
+        // Tool Use
         public var id: String?
         public var name: String?
-        public var text: String?
         public var input: [String: AnyValue]?
-        public var partialJSON: String?
-        
+
+        // Streaming
+        public var partial_json: String?
+
         public enum ContentType: String, Codable {
             case text
-            case text_delta
             case tool_use
+
+            // Streaming
+            case text_delta
             case input_json_delta
         }
-        
-        enum CodingKeys: String, CodingKey {
-            case type
-            case id
-            case name
-            case text
-            case input
-            case partialJSON = "partial_json"
-        }
     }
-    
+
+    public enum StopReason: String, Codable {
+        case end_turn
+        case max_tokens
+        case stop_sequence
+        case tool_use
+    }
+
     public struct Usage: Codable {
-        public var inputTokens: Int
-        public var outputTokens: Int
-        
-        enum CodingKeys: String, CodingKey {
-            case inputTokens = "input_tokens"
-            case outputTokens = "output_tokens"
-        }
-    }
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case model
-        case type
-        case role
-        case content
-        case stopReason = "stop_reason"
-        case stopSequence = "stop_sequence"
-        case usage
-        case error
+        public var input_tokens: Int?
+        public var cache_creation_input_tokens: Int?
+        public var cache_read_input_tokens: Int?
+        public var output_tokens: Int?
     }
 }

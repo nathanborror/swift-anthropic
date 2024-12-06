@@ -12,10 +12,8 @@ struct Command: AsyncParsableCommand {
         subcommands: [
             Models.self,
             ChatCompletion.self,
-            ChatCompletionStream.self,
-            ChatCompletionWithTool.self,
         ],
-        defaultSubcommand: ChatCompletion.self
+        defaultSubcommand: Models.self
     )
 }
 
@@ -24,8 +22,8 @@ struct GlobalOptions: ParsableCommand {
     var key: String
     
     @Option(name: .shortAndLong, help: "Model to use.")
-    var model = Defaults.chatModel
-    
+    var model = "claude-3-5-sonnet-latest"
+
     @Option(name: .shortAndLong, help: "System prompt.")
     var systemPrompt: String?
 
@@ -46,7 +44,7 @@ struct Models: AsyncParsableCommand {
     var global: GlobalOptions
     
     func run() async throws {
-        let client = AnthropicClient(configuration: .init(token: global.key))
+        let client = Client(apiKey: global.key)
         let resp = try await client.models()
         print(resp.models.map { $0.id }.joined(separator: "\n"))
     }
@@ -57,23 +55,20 @@ struct ChatCompletion: AsyncParsableCommand {
         commandName: "complete",
         abstract: "Completes a chat request."
     )
-    
+
     @OptionGroup
     var global: GlobalOptions
 
-    @Flag(help: "Use the stream endpoint.")
-    var stream = false
-    
     func run() async throws {
-        let client = AnthropicClient(configuration: .init(token: global.key))
+        let client = Client(apiKey: global.key)
         var messages: [ChatRequest.Message] = []
-        
+
         write("\nUsing \(global.model)\n\n")
-        
+
         if let system = global.system {
             write("\n<system>\n\(system)\n</system>\n\n")
         }
-        
+
         while true {
             write("> ")
             guard let input = readLine(), !input.isEmpty else {
@@ -83,129 +78,26 @@ struct ChatCompletion: AsyncParsableCommand {
                 write("Exiting...")
                 break
             }
-            messages.append(.init(role: .user, content: [.init(type: .text, text: input)]))
-            
-            let req = ChatRequest(
-                model: global.model,
-                messages: messages,
-                system: global.system,
-                maxTokens: 8192
-            )
 
-            if stream {
-                var message: ChatResponse? = nil
-                for try await resp in try client.chatStream(req) {
-                    write(resp.delta?.text)
-                    message = resp.apply(to: message)
-                }
-                newline()
-                let content = message?.content?.map { ChatRequest.Message.Content(content: $0) }
-                messages.append(.init(role: .assistant, content: content ?? []))
-            } else {
-                let resp = try await client.chat(req)
-                let content = resp.content?.map { ChatRequest.Message.Content(content: $0) }
-                messages.append(.init(role: .assistant, content: content ?? []))
-                
-                for content in resp.content ?? [] {
-                    write(content.text); newline()
-                }
-            }
+            let message = ChatRequest.Message(role: .user, content: [.init(type: .text, text: input)])
+            messages.append(message)
+
+            let req = ChatRequest(model: global.model, messages: [message], max_tokens: 8192)
+
+            let resp = try await client.chat(req)
+            let content = resp.content?.first?.text
+            write(content); newline()
         }
     }
-    
+
     func write(_ text: String?) {
         if let text, let data = text.data(using: .utf8) {
             FileHandle.standardOutput.write(data)
         }
     }
-    
+
     func newline() {
         write("\n")
-    }
-}
-
-struct ChatCompletionStream: AsyncParsableCommand {
-    static var configuration = CommandConfiguration(
-        commandName: "stream",
-        abstract: "Completes a streaming chat request."
-    )
-    
-    @OptionGroup
-    var global: GlobalOptions
-    
-    @Argument(help: "Your messages.")
-    var content: String
-    
-    func run() async throws {
-        let client = AnthropicClient(configuration: .init(token: global.key))
-        let messages: [ChatRequest.Message] = [.init(role: .user, content: [.init(type: .text, text: content)])]
-        let req = ChatRequest(
-            model: global.model,
-            messages: messages,
-            system: global.system,
-            maxTokens: 8192
-        )
-        for try await resp in try client.chatStream(req) {
-            if let text = resp.delta?.text, let data = text.data(using: .utf8) {
-                try FileHandle.standardOutput.write(contentsOf: data)
-            }
-        }
-    }
-}
-
-struct ChatCompletionWithTool: AsyncParsableCommand {
-    static var configuration = CommandConfiguration(
-        commandName: "tool",
-        abstract: "Completes a chat request using a tool."
-    )
-    
-    @OptionGroup
-    var global: GlobalOptions
-    
-    @Argument(help: "Your messages.")
-    var content: String
-    
-    func run() async throws {
-        let client = AnthropicClient(configuration: .init(token: global.key))
-        let messages: [ChatRequest.Message] = [.init(role: .user, content: [.init(type: .text, text: content)])]
-        let tools: [ChatRequest.Tool] = [
-            .init(
-                name: "get_weather",
-                description: "Get the current weather in a given location",
-                inputSchema: .init(
-                    type: .object,
-                    properties: [
-                        "location": .init(type: .string, description: "The city and state, e.g. San Francisco, CA")
-                    ],
-                    required: ["location"]
-                )
-            )
-        ]
-        let req = ChatRequest(
-            model: global.model,
-            messages: messages,
-            system: global.system,
-            maxTokens: 8192,
-            tools: tools
-        )
-        let resp = try await client.chat(req)
-        
-        for content in resp.content ?? [] {
-            switch content.type {
-            case .text, .text_delta:
-                print(content.text ?? "missing content")
-            case .tool_use:
-                if let data = try? JSONEncoder().encode(content.input), let str = String(data: data, encoding: .utf8) {
-                    print("\(content.name ?? "missing name")(\(str))")
-                } else {
-                    print("Error: missing name or input")
-                }
-            case .input_json_delta:
-                print(content.partialJSON ?? "missing JSON")
-            case .none:
-                break
-            }
-        }
     }
 }
 

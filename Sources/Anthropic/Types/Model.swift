@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ModelListResponse: Codable {
+public struct ModelsResponse: Codable {
     public let models: [Model]
 }
 
