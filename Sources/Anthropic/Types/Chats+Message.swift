@@ -94,5 +94,10 @@ extension ChatRequest {
             self.role = role
             self.content = content
         }
+
+        public init(role: Role, text: String?) {
+            self.role = role
+            self.content = [.init(type: .text, text: text)]
+        }
     }
 }
