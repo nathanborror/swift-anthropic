@@ -9,11 +9,11 @@ public struct ChatRequest: Codable {
     public var stop_sequences: [String]?
     public var stream: Bool?
     public var system: [Message.Content]? // Restricted to text
-    public var temperature: Float?
+    public var temperature: Double?
     public var tool_choice: ToolChoice?
     public var tools: [Tool]?
     public var top_k: UInt?
-    public var top_p: Float?
+    public var top_p: Double?
 
     public struct Tool: Codable {
         public var name: String
@@ -53,8 +53,8 @@ public struct ChatRequest: Codable {
 
     public init(model: String, messages: [Message], max_tokens: Int, metadata: Metadata? = nil,
                 stop_sequences: [String]? = nil, stream: Bool? = nil, system: [Message.Content]? = nil,
-                temperature: Float? = nil, tool_choice: ToolChoice? = nil, tools: [Tool]? = nil,
-                top_k: UInt? = nil, top_p: Float? = nil) {
+                temperature: Double? = nil, tool_choice: ToolChoice? = nil, tools: [Tool]? = nil,
+                top_k: UInt? = nil, top_p: Double? = nil) {
         self.model = model
         self.messages = messages
         self.max_tokens = max_tokens
