@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
-        "branch" : "main",
-        "revision" : "91f187c5439537856869b5a33d7f6efc3b6af555"
+        "revision" : "2f2c55fabcdd81a1022e15c719a837cfe67ec530",
+        "version" : "1.0.0"
       }
     }
   ],
