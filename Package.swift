@@ -16,12 +16,12 @@ let package = Package(
         .executable(name: "AnthropicCmd", targets: ["AnthropicCmd"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/nathanborror/swift-shared-kit", branch: "main"),
+        .package(url: "https://github.com/nathanborror/swift-json", branch: "main"),
         .package(url: "https://github.com/apple/swift-argument-parser", branch: "main"),
     ],
     targets: [
         .target(name: "Anthropic", dependencies: [
-            .product(name: "SharedKit", package: "swift-shared-kit"),
+            .product(name: "JSON", package: "swift-json"),
         ]),
         .executableTarget(name: "AnthropicCmd", dependencies: [
             "Anthropic",

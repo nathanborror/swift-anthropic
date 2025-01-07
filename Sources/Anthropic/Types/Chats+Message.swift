@@ -1,5 +1,5 @@
 import Foundation
-import SharedKit
+import JSON
 
 extension ChatRequest {
 
@@ -23,8 +23,8 @@ extension ChatRequest {
             
             // Tool Use
             public var name: String?
-            public var input: [String: AnyValue]?
-            
+            public var input: [String: JSONValue]?
+
             // Tool Result
             public var tool_use_id: String?
             public var content: [Content]? // Restricted to text or image
@@ -75,7 +75,7 @@ extension ChatRequest {
             }
             
             public init(type: ContentType, id: String? = nil, text: String? = nil, cache_control: CacheControl? = nil,
-                        source: Source? = nil, name: String? = nil, input: [String : AnyValue]? = nil,
+                        source: Source? = nil, name: String? = nil, input: [String : JSONValue]? = nil,
                         tool_use_id: String? = nil, content: [Content]? = nil, is_error: Bool? = nil) {
                 self.type = type
                 self.id = id

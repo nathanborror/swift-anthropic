@@ -1,5 +1,5 @@
 import Foundation
-import SharedKit
+import JSON
 
 public struct ChatRequest: Codable {
     public var model: String
@@ -94,7 +94,7 @@ public struct ChatResponse: Codable {
         // Tool Use
         public let id: String?
         public let name: String?
-        public let input: [String: AnyValue]?
+        public let input: [String: JSONValue]?
 
         // Streaming
         public let partial_json: String?
