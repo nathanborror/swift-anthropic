@@ -48,8 +48,12 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
             if line.hasPrefix("data:") {
                 let obj = line.trimmingPrefix("data:").trimmingCharacters(in: .whitespacesAndNewlines)
                 jsonObjects.append(obj)
-            } else if line.hasPrefix("event:") { // ignore events
+            } else if line.hasPrefix("event:") {
                 continue
+            } else if line.isEmpty {
+                continue
+            } else {
+                jsonObjects.append(line)
             }
         }
         

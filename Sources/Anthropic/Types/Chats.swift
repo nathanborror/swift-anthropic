@@ -133,11 +133,9 @@ public struct ChatResponseStream: Codable {
     public let content_block: ChatResponse.Content?
 
     public let usage: ChatResponse.Usage?
-    public let error: ErrorResponse?
 
     public enum EventType: String, Codable {
         case ping
-        case error
 
         case message_start
         case message_delta
@@ -146,11 +144,5 @@ public struct ChatResponseStream: Codable {
         case content_block_start
         case content_block_delta
         case content_block_stop
-
-    }
-
-    public struct ErrorResponse: Codable {
-        public let type: String
-        public let message: String
     }
 }
