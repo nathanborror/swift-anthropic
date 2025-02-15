@@ -4,7 +4,7 @@ public final class Client {
 
     public static let defaultHost = URL(string: "https://api.anthropic.com/v1")!
     public static let defaultApiVersion = "2023-06-01"
-    public static let defaultBetaHeader: String? = "max-tokens-3-5-sonnet-2024-07-15"
+    public static let defaultBetaHeader: String? = nil
 
     public let host: URL
     public let apiKey: String
