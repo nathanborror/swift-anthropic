@@ -45,7 +45,7 @@ struct Models: AsyncParsableCommand {
     func run() async throws {
         let client = Anthropic.Client(apiKey: global.key)
         let resp = try await client.models()
-        print(resp.models.map { $0.id }.joined(separator: "\n"))
+        print(resp.data.map { $0.id }.joined(separator: "\n"))
     }
 }
 
