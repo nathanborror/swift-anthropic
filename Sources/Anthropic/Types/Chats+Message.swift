@@ -18,6 +18,11 @@ extension ChatRequest {
             public var text: String?
             public var cache_control: CacheControl?
 
+            // Thinking
+            public var thinking: String?
+            public var data: Data?
+            public var signature: String?
+
             // Image or Document
             public var source: Source?
             
@@ -48,6 +53,8 @@ extension ChatRequest {
                 case tool_use
                 case tool_result
                 case document
+                case thinking
+                case redacted_thinking
             }
             
             public struct Source: Codable {
@@ -73,14 +80,17 @@ extension ChatRequest {
                     self.data = data
                 }
             }
-            
+
             public init(type: ContentType, id: String? = nil, text: String? = nil, cache_control: CacheControl? = nil,
-                        source: Source? = nil, name: String? = nil, input: [String : JSONValue]? = nil,
-                        tool_use_id: String? = nil, content: [Content]? = nil, is_error: Bool? = nil) {
+                        thinking: String? = nil, data: Data? = nil, signature: String? = nil, source: Source? = nil,
+                        name: String? = nil, input: [String : JSONValue]? = nil, tool_use_id: String? = nil,
+                        content: [Content]? = nil, is_error: Bool? = nil) {
                 self.type = type
                 self.id = id
                 self.text = text
                 self.cache_control = cache_control
+                self.thinking = thinking
+                self.signature = signature
                 self.source = source
                 self.name = name
                 self.input = input

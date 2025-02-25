@@ -3,6 +3,7 @@ import JSON
 
 public struct ChatRequest: Codable {
     public var model: String
+    public var thinking: Thinking?
     public var messages: [Message]
     public var max_tokens: Int
     public var metadata: Metadata?
@@ -14,6 +15,16 @@ public struct ChatRequest: Codable {
     public var tools: [Tool]?
     public var top_k: UInt?
     public var top_p: Double?
+
+    public struct Thinking: Codable {
+        public var type: String
+        public var budget_tokens: Int?
+
+        public init(type: String = "enabled", budget_tokens: Int? = nil) {
+            self.type = type
+            self.budget_tokens = budget_tokens
+        }
+    }
 
     public struct Tool: Codable {
         public var name: String
@@ -91,6 +102,11 @@ public struct ChatResponse: Codable {
         // Text
         public let text: String?
 
+        // Thinking
+        public let thinking: String?
+        public let signature: String?
+        public let data: Data?
+
         // Tool Use
         public let id: String?
         public let name: String?
@@ -106,6 +122,11 @@ public struct ChatResponse: Codable {
             // Streaming
             case text_delta
             case input_json_delta
+
+            // Thinking
+            case thinking_delta
+            case signature_delta
+            case redacted_thinking
         }
     }
 
