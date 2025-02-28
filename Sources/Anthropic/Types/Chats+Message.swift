@@ -59,10 +59,12 @@ extension ChatRequest {
             
             public struct Source: Codable {
                 public var type: SourceType
-                public var media_type: MediaType
-                public var data: Data
-                
+                public var media_type: MediaType?
+                public var data: Data?
+                public var url: URL?
+
                 public enum SourceType: String, Codable {
+                    case url
                     case base64
                 }
                 
@@ -74,10 +76,11 @@ extension ChatRequest {
                     case pdf = "application/pdf"
                 }
                 
-                public init(type: SourceType, media_type: MediaType, data: Data) {
+                public init(type: SourceType, media_type: MediaType? = nil, data: Data? = nil, url: URL? = nil) {
                     self.type = type
                     self.media_type = media_type
                     self.data = data
+                    self.url = url
                 }
             }
 
