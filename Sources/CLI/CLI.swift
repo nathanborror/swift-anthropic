@@ -3,16 +3,16 @@ import ArgumentParser
 import Anthropic
 
 @main
-struct Command: AsyncParsableCommand {
-    
+struct CLI: AsyncParsableCommand {
+
     static var configuration = CommandConfiguration(
+        commandName: "anthropic",
         abstract: "A utility for interacting with the Anthropic API.",
         version: "0.0.1",
         subcommands: [
             Models.self,
             ChatCompletion.self,
-        ],
-        defaultSubcommand: Models.self
+        ]
     )
 }
 
@@ -21,7 +21,7 @@ struct GlobalOptions: ParsableCommand {
     var key: String
     
     @Option(name: .shortAndLong, help: "Model to use.")
-    var model = "claude-3-5-sonnet-latest"
+    var model: String?
 
     @Option(name: .shortAndLong, help: "System prompt.")
     var systemPrompt: String?
@@ -62,10 +62,13 @@ struct ChatCompletion: AsyncParsableCommand {
     var stream: Bool?
 
     func run() async throws {
+        guard let model = global.model else {
+            fatalError("Missing model argument")
+        }
         let client = Anthropic.Client(apiKey: global.key)
         var messages: [ChatRequest.Message] = []
 
-        write("\nUsing \(global.model)\n\n")
+        write("\nUsing \(model)\n\n")
 
         if let system = global.system {
             write("\n<system>\n\(system)\n</system>\n\n")
@@ -86,7 +89,7 @@ struct ChatCompletion: AsyncParsableCommand {
             messages.append(message)
 
             var req = ChatRequest(
-                model: global.model,
+                model: model,
                 messages: [message],
                 max_tokens: 8192,
                 stream: stream

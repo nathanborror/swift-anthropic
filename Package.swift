@@ -13,7 +13,6 @@ let package = Package(
     ],
     products: [
         .library(name: "Anthropic", targets: ["Anthropic"]),
-        .executable(name: "AnthropicCmd", targets: ["AnthropicCmd"]),
     ],
     dependencies: [
         .package(url: "https://github.com/nathanborror/swift-json", branch: "main"),
@@ -23,7 +22,7 @@ let package = Package(
         .target(name: "Anthropic", dependencies: [
             .product(name: "JSON", package: "swift-json"),
         ]),
-        .executableTarget(name: "AnthropicCmd", dependencies: [
+        .executableTarget(name: "CLI", dependencies: [
             "Anthropic",
             .product(name: "ArgumentParser", package: "swift-argument-parser"),
         ]),
