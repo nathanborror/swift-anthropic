@@ -1,5 +1,5 @@
 main:
 	@swift build
-	@cp .build/debug/AnthropicCmd anthropic
+	@cp .build/debug/CLI anthropic
 	@chmod +x anthropic
 	@echo "Run the program with ./anthropic"
