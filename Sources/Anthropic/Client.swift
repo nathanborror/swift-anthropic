@@ -13,12 +13,22 @@ public final class Client {
 
     internal(set) public var session: URLSession
 
+    private let encoder: JSONEncoder
+    private let decoder: JSONDecoder
+
     public init(session: URLSession = URLSession(configuration: .default), host: URL? = nil, apiKey: String, apiVersion: String? = nil, betaHeader: String? = nil) {
         self.session = session
         self.host = host ?? Self.defaultHost
         self.apiKey = apiKey
         self.apiVersion = apiVersion ?? Self.defaultApiVersion
         self.betaHeader = betaHeader
+        self.encoder = JSONEncoder()
+        self.decoder = JSONDecoder()
+        self.decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let dateInt = try container.decode(Int.self)
+            return Date(timeIntervalSince1970: TimeInterval(dateInt))
+        }
     }
 
     public enum Error: Swift.Error, CustomStringConvertible {
@@ -146,18 +156,8 @@ extension Client {
             req.setValue(betaHeader, forHTTPHeaderField: "anthropic-beta")
         }
         if let body {
-            req.httpBody = try JSONEncoder().encode(body)
+            req.httpBody = try encoder.encode(body)
         }
         return req
-    }
-
-    private var decoder: JSONDecoder {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .custom { decoder in
-            let container = try decoder.singleValueContainer()
-            let dateInt = try container.decode(Int.self)
-            return Date(timeIntervalSince1970: TimeInterval(dateInt))
-        }
-        return decoder
     }
 }

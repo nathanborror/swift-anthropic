@@ -16,6 +16,7 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
     
     private let request: URLRequest
     private let session: URLSession
+    private let decoder: JSONDecoder
 
     private var streamingBuffer = ""
     private let streamingCompletionMarker = "[DONE]"
@@ -23,6 +24,12 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
     init(session: URLSession, request: URLRequest) {
         self.session = session
         self.request = request
+        self.decoder = JSONDecoder()
+        self.decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let dateInt = try container.decode(Int.self)
+            return Date(timeIntervalSince1970: TimeInterval(dateInt))
+        }
     }
     
     func perform() {
@@ -82,15 +89,5 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
                 }
             }
         }
-    }
-    
-    private var decoder: JSONDecoder {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .custom { decoder in
-            let container = try decoder.singleValueContainer()
-            let dateInt = try container.decode(Int.self)
-            return Date(timeIntervalSince1970: TimeInterval(dateInt))
-        }
-        return decoder
     }
 }
