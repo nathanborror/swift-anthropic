@@ -13,16 +13,16 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
     var onReceiveContent: ((StreamingSession, ResultType) -> Void)?
     var onProcessingError: ((StreamingSession, Error) -> Void)?
     var onComplete: ((StreamingSession, Error?) -> Void)?
-    
+
+    private var session: URLSession? = nil
+
     private let request: URLRequest
-    private let session: URLSession
     private let decoder: JSONDecoder
 
     private var streamingBuffer = ""
     private let streamingCompletionMarker = "[DONE]"
 
-    init(session: URLSession, request: URLRequest) {
-        self.session = session
+    init(configuration: URLSessionConfiguration, request: URLRequest) {
         self.request = request
         self.decoder = JSONDecoder()
         self.decoder.dateDecodingStrategy = .custom { decoder in
@@ -30,10 +30,12 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
             let dateInt = try container.decode(Int.self)
             return Date(timeIntervalSince1970: TimeInterval(dateInt))
         }
+        super.init()
+        self.session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }
     
     func perform() {
-        session
+        session?
             .dataTask(with: request)
             .resume()
     }

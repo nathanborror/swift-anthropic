@@ -115,7 +115,7 @@ extension Client {
         try checkAuthentication()
         let request = try makeRequest(path: path, method: method, body: body)
         return AsyncThrowingStream { continuation in
-            let session = StreamingSession<Response>(session: session, request: request)
+            let session = StreamingSession<Response>(configuration: session.configuration, request: request)
             session.onReceiveContent = {_, object in
                 continuation.yield(object)
             }
