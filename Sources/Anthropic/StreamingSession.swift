@@ -14,20 +14,20 @@ final class StreamingSession<ResultType: Codable>: NSObject, Identifiable, URLSe
     var onProcessingError: ((StreamingSession, Error) -> Void)?
     var onComplete: ((StreamingSession, Error?) -> Void)?
     
+    private let request: URLRequest
+    private let session: URLSession
+
     private var streamingBuffer = ""
     private let streamingCompletionMarker = "[DONE]"
-    private let urlRequest: URLRequest
-    private lazy var urlSession: URLSession = {
-        URLSession(configuration: .default, delegate: self, delegateQueue: nil)
-    }()
-    
-    init(urlRequest: URLRequest) {
-        self.urlRequest = urlRequest
+
+    init(session: URLSession, request: URLRequest) {
+        self.session = session
+        self.request = request
     }
     
     func perform() {
-        self.urlSession
-            .dataTask(with: self.urlRequest)
+        session
+            .dataTask(with: request)
             .resume()
     }
     
